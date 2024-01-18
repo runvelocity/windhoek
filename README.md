@@ -2,10 +2,11 @@
 
 Windhoek is a small API written in Golang that exposes an invoke route we can call to run a function within a Firecracker VM.
 
-# How to run
-## Install dependencies
+## How to run
 
-### Install Golang
+### Install dependencies
+
+#### Install Golang
 ```bash
  pushd /tmp
  wget https://go.dev/dl/go1.21.5.linux-amd64.tar.gz
@@ -14,7 +15,7 @@ Windhoek is a small API written in Golang that exposes an invoke route we can ca
  popd
 ```
 
-### Install Firecracker
+#### Install Firecracker
 ```bash
 pushd /tmp
 ARCH="$(uname -m)"
@@ -28,7 +29,7 @@ mv release-${latest}-$(uname -m)/firecracker-${latest}-${ARCH} /usr/local/bin/fi
 popd
 ```
 
-### Install CNI plugins
+#### Install CNI plugins
 ```bash
 apt-get install make
 git clone https://github.com/containernetworking/plugins.git /tmp/cni-plugins
@@ -49,16 +50,48 @@ popd
 popd
 ```
 
-### Create required directories
+#### Create required directories
 
 ```bash
 mkdir /root/fckernels /root/fcsockets /root/fcruntimes
 ```
 
-### Download Kernel and Runtime root filesystem
+#### Download Kernel and Runtime root filesystem
 
 ```bash
 cd /root/fcruntimes && wget https://terraform-20231223074656017300000001.s3.amazonaws.com/rootfs/nodejs-runtime/nodejs-runtime.ext4
 cd /root/fckernels && curl -fsSL -o hello-vmlinux.bin https://s3.amazonaws.com/spec.ccfc.min/img/hello/kernel/hello-vmlinux.bin
 
+```
+
+### Deployment
+
+The windhoek service runs as a systemd process within each worker node. To run, follow these steps:
+
+#### Create systemd file
+
+```bash
+cat <<EOF > /etc/systemd/system/windhoek.service
+[Unit]
+Description=Windhoek
+After=network.target
+
+[Service]
+ExecStart=/root/windhoek
+Restart=always
+
+[Install]
+WantedBy=default.target
+EOF
+```
+
+#### Reload the systemd service 
+```bash
+systemctl daemon-reload
+```
+
+#### Enable and start the service
+```bash
+systemctl enable windhoek.service
+systemctl start windhoek.service
 ```
