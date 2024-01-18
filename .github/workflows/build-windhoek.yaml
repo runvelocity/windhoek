@@ -1,0 +1,36 @@
+name: Build and Lint Windhoek
+
+on:
+  push:
+    branches:
+    - main
+  pull_request:
+    branches:
+    - main
+
+jobs:
+  build:
+    runs-on: ubuntu-latest
+    steps:
+    - uses: actions/checkout@v2
+
+    - name: Setup Go
+      uses: actions/setup-go@v2
+      with:
+        go-version: '1.21.5' # The Go version to download (if necessary) and use.
+
+    - name: Install dependencies
+      run: |
+        go version
+        go mod tidy
+        
+    - name: Run build
+      run: go build . 
+      
+    - name: Run vet
+      run: |
+        go vet .
+    - name: golangci-lint
+      uses: golangci/golangci-lint-action@v3
+      with:
+        version: v1.54
