@@ -1,5 +1,7 @@
 # Windhoek
 
+![Build and Lint Windhoek](https://github.com/runvelocity/windhoek/actions/workflows/build-windhoek.yaml/badge.svg)
+
 Windhoek is a small API written in Golang that exposes an invoke route we can call to run a function within a Firecracker VM.
 
 ## How to run
