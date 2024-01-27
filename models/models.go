@@ -1,4 +1,4 @@
-package utils
+package models
 
 type FirecrackerVmRequest struct {
 	FunctionId       string        `json:"functionId"`
