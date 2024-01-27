@@ -11,7 +11,6 @@ import (
 	"github.com/labstack/echo/v4"
 	"github.com/runvelocity/windhoek/internal/vm"
 	"github.com/runvelocity/windhoek/models"
-	"github.com/runvelocity/windhoek/utils"
 	"github.com/sirupsen/logrus"
 )
 
@@ -27,10 +26,13 @@ func InvokeHandler(c echo.Context) error {
 	if err := c.Bind(&vmRequest); err != nil {
 		return echo.NewHTTPError(http.StatusBadRequest, err.Error())
 	}
-	vmRequest.SocketPath = fmt.Sprintf("%s/firecracker-%s.sock", utils.FC_SOCKETS_PATH, vmRequest.FunctionId)
+	vmRequest.SocketPath = fmt.Sprintf("%s/firecracker-%s.sock", vm.FC_SOCKETS_PATH, vmRequest.FunctionId)
 
 	vmManager := vm.VmManager{}
 	m, ctx, err := vmManager.CreateVm(vmRequest)
+	if err != nil {
+		return echo.NewHTTPError(http.StatusInternalServerError, fmt.Sprintf("error occured while creating vm. %s", err.Error()))
+	}
 	defer func() {
 		err := m.Shutdown(ctx)
 		if err != nil {
@@ -41,9 +43,6 @@ func InvokeHandler(c echo.Context) error {
 			log.Error("Error deleting socket file", vmRequest.SocketPath)
 		}
 	}()
-	if err != nil {
-		return echo.NewHTTPError(http.StatusInternalServerError, fmt.Sprintf("error occured while creating vm. %s", err.Error()))
-	}
 
 	url := fmt.Sprintf("http://%s:3000/invoke", m.Cfg.NetworkInterfaces[0].StaticConfiguration.IPConfiguration.IPAddr.IP.String())
 	argsJSON, err := json.Marshal(vmRequest.InvokePayload.Args)
