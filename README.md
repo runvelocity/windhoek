@@ -61,8 +61,8 @@ mkdir /root/fckernels /root/fcsockets /root/fcruntimes
 #### Download Kernel and Runtime root filesystem
 
 ```bash
-cd /root/fcruntimes && wget https://terraform-20231223074656017300000001.s3.amazonaws.com/rootfs/nodejs-runtime/nodejs-runtime.ext4
-cd /root/fckernels && curl -fsSL -o hello-vmlinux.bin https://s3.amazonaws.com/spec.ccfc.min/img/hello/kernel/hello-vmlinux.bin
+cd /root/fcruntimes && wget https://terraform-20231223074656017300000001.s3.amazonaws.com/runtimes/nodejs-runtime.ext4
+cd /root/fckernels && wget https://terraform-20231223074656017300000001.s3.amazonaws.com/kernels/vmlinux
 
 ```
 
